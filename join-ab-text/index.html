@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Step 1: Riddle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #0b0f14; color: #eaf0f6; display: grid; place-items: center; min-height: 100vh; margin: 0; }
+    .card { background: #121824; padding: 2rem; border-radius: 12px; max-width: 700px; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+    h1 { margin-top: 0; font-size: 1.6rem; }
+    .riddle { font-size: 1.1rem; line-height: 1.6; margin: 1rem 0 1.2rem; }
+    input[type="text"] { width: 100%; padding: .8rem 1rem; border-radius: 8px; border: 1px solid #2a3240; background: #0f141c; color: #eaf0f6; }
+    button { margin-top: .8rem; padding: .7rem 1rem; border: 0; border-radius: 8px; background: #5b8cff; color: #fff; cursor: pointer; font-weight: 600; }
+    .msg { margin-top: .8rem; color: #9fb3c8; min-height: 24px; }
+    .hint { color: #ffd76a; margin-top: .4rem; display: none; }
+    .foot { margin-top: 1.2rem; font-size: .85rem; color: #7d8da1; }
+    a { color: #89b4ff; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Step 1: Solve the riddle</h1>
+    <p class="riddle">
+      I win by losing half the time.<br/>
+      I split a crowd and learn a sign.<br/>
+      One letter joins another’s quest—<br/>
+      Which test makes marketers their best?
+    </p>
+    <input id="answer" type="text" placeholder="your answer…" autocomplete="off" />
+    <button id="submit">Unlock step 2</button>
+    <div class="msg" id="message"></div>
+    <div class="hint" id="hint">Hint: It’s the simplest experiment with two variants.</div>
+    <div class="foot">P.S. Case doesn’t matter. Punctuation is optional.</div>
+  </div>
+  <script>
+    const submit = document.getElementById('submit');
+    const msg = document.getElementById('message');
+    const hint = document.getElementById('hint');
+    const input = document.getElementById('answer');
+    const accepted = new Set([
+      'a/b test','ab test','a b test','a-b test','split test','a/b testing','ab testing','split testing'
+    ]);
+    let attempts = 0;
+
+    function normalize(s) {
+      return s.trim().toLowerCase().replace(/\./g,'').replace(/,/g,'').replace(/\s+/g,' ').replace(/\/|-/g,'/').replace(/a b/g,'ab');
+    }
+
+    function wrong() {
+      msg.textContent = "You may think you're smart but there is always smarter.";
+      attempts++;
+      if (attempts >= 3) hint.style.display = 'block';
+    }
+
+    submit.addEventListener('click', () => {
+      const val = normalize(input.value);
+      if (!val) return wrong();
+      if ([...accepted].some(ans => val.includes(ans.replace(/\s+/g,' ')))) {
+        window.location.href = "/AiSlopOrNot/stage2/"; // important for repo-based Pages
+      } else {
+        wrong();
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submit.click();
+    });
+  </script>
+</body>
+</html>
