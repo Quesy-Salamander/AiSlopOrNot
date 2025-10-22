@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Step 2: Fix the Python</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #0b0f14; color: #eaf0f6; margin: 0; }
+    .wrap { max-width: 1000px; margin: auto; padding: 1rem; }
+    h1 { font-size: 1.4rem; }
+    .panel { background: #121824; border-radius: 12px; padding: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+    textarea { width: 100%; height: 360px; background: #0f141c; color: #eaf0f6; border: 1px solid #2a3240; border-radius: 8px; padding: .8rem; font-size: .95rem; }
+    button { margin-top: .8rem; padding: .6rem 1rem; border: 0; border-radius: 8px; background: #5b8cff; color: #fff; font-weight: 600; cursor: pointer; }
+    pre, .out { background: #0f141c; color: #cfe3ff; border: 1px solid #2a3240; border-radius: 8px; padding: .8rem; overflow: auto; }
+    .hint { color: #ffd76a; margin-top: .6rem; display: none; }
+    .foot { color: #8aa0b8; font-size: .9rem; margin-top: 1rem; }
+  </style>
+  https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js</script>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Step 2: Make this Python run and set <code>PASS = True</code></h1>
+    <div class="panel">
+      <p><strong>Rules:</strong> Don’t hardcode <code>PASS = True</code>. Fix syntax/logic so the final condition is met. Then click “Run”.</p>
+      <textarea id="code"></textarea>
+      <button id="run">Run</button>
+      <div class="hint" id="hint">Hint after 2 runs: Watch function signatures, typos, divide-by-zero, and types.</div>
+      <h3>Output</h3>
+      <pre id="stdout"></pre>
+      <h3>Errors</h3>
+      <pre id="stderr"></pre>
+      <div class="foot">When <code>PASS</code> is <strong>True</strong>, you’ll automatically advance.</div>
+    </div>
+  </div>
+
+  <script>
+    const starter = `# Fix me to set PASS = True by meeting all conditions.
+# Do not hardcode PASS = True. You may modify code as needed to make it correct.
+
+import math
+
+def ctr(clicks impressions):
+    return clicks / impressions
+
+def conversion_rate(conversions, clicks):
+    return conversion / clicks
+
+class Campaign:
+    def __init__(self, name, budget=1000):
+        self.name = name
+        self.budget = budgte
+
+    def roi(self, revenue, cost):
+        return (revenue - cost) / cost
+
+if __name__ == "__main__":
+    clicks = 250
+    impressions = 0
+    conversions = '7'
+    rate = ctr(clicks, impressions)
+    conv = conversion_rate(conversions, clicks)
+    print(f"CTR: {rate:.2%}, CR: {conv:.2%}")
+    camp = Campaign("AI Podcast")
+    # ROI must be at least 0.10 to pass
+    if camp.roi(1200, 1000) > 0.1
+        PASS = True
+`;
+
+    const codeArea = document.getElementById('code');
+    const out = document.getElementById('stdout');
+    const err = document.getElementById('stderr');
+    const hint = document.getElementById('hint');
+    const runBtn = document.getElementById('run');
+
+    codeArea.value = starter;
+
+    let pyodideReadyPromise = loadPyodide();
+
+    let runs = 0;
+    runBtn.addEventListener('click', async () => {
+      runs++;
+      if (runs >= 2) hint.style.display = 'block';
+      runBtn.disabled = true;
+      out.textContent = '';
+      err.textContent = '';
+      try {
+        const pyodide = await pyodideReadyPromise;
+        pyodide.globals.clear();
+        pyodide.setStdout({ batched: (s) => out.textContent += s });
+        pyodide.setStderr({ batched: (s) => err.textContent += s });
+        await pyodide.runPythonAsync(codeArea.value);
+        const hasPASS = pyodide.globals.has('PASS');
+        const PASS = hasPASS ? pyodide.globals.get('PASS') : false;
+        if (PASS === true) {
+          out.textContent += "\\n\\n✅ PASS detected. Advancing…";
+          setTimeout(() => window.location.href = "/AiSlopOrNot/success/", 700);
+        } else {
+          out.textContent += "\\n\\nℹ️ PASS is not True yet.";
+        }
+      } catch (e) {
+        err.textContent = String(e);
+      } finally {
+        runBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
